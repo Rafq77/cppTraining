@@ -1,0 +1,5 @@
+Exercise 1:  "Warm Up"
+Exercise 2:  "Lambdas"
+Exercise 3:  "Move"
+Exercise 4:  "Rule of Zero"
+Exercise 5:  "Library"
