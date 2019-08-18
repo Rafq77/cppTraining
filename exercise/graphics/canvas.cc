@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 Detlef Vollmann, vollmann engineering gmbh
+ * Copyright (c) 2014-2019 Detlef Vollmann, vollmann engineering gmbh
  *
  * Distributed under the Boost Software License, Version 1.0.
  * (See accompanying file LICENSE_1_0.txt or copy at
@@ -30,7 +30,7 @@ Canvas::Canvas(int width, int height, std::string const &name)
 
 Canvas::~Canvas()
 {
-    win->unregisterCallback(); // required for Win32
+    win->unregisterCallback(); // it's the contract
     for (std::vector<Shape *>::iterator i = elems.begin();
          i != elems.end();
          ++i)

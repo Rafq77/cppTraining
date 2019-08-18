@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 Detlef Vollmann, vollmann engineering gmbh
+ * Copyright (c) 2014-2019 Detlef Vollmann, vollmann engineering gmbh
  *
  * Distributed under the Boost Software License, Version 1.0.
  * (See accompanying file LICENSE_1_0.txt or copy at
@@ -24,7 +24,7 @@ CanvasImpl::CanvasImpl(int width, int height, std::string const &name)
   , cr{cairo_create(surface)}
 {
     win->registerCallback([this] { draw(); });
-    (*this) += new PathShape<Rectangle, true>(Rectangle(width, height), "Background", Position(0, 0), Color::White);
+    (*this) += new PathShape{new Rectangle(width, height), "Background", true, Position{0, 0}, Color::White};
     show();
 }
 

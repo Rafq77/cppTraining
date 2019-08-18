@@ -35,7 +35,7 @@ private:
     virtual void doDraw(cairo_t *context) const;
 
     std::vector<Shape *> children;
-    //typedef decltype(children.begin()) SIter; // MSVC doesn't like this
+    //typedef decltype(children.begin()) SIter; // this would be a reference
     typedef std::vector<Shape *>::iterator SIter;
 
 public:

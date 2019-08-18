@@ -16,8 +16,6 @@
 #include <vector>
 #include <utility>
 
-using namespace exercise;
-
 //#define GROUP_MOVE 1
 //#define CANVAS_MOVE 1
 
@@ -75,7 +73,7 @@ void textWin()
 
     Canvas c(200, 100, "Text Win 1");
     Text *txt1 = new Text("Hello", "Text 2", Position(30, 20));
-    PathShape *frame = new PathShape(new Rectangle(90, 30), "Frame 2", false);
+    Shape *frame = new PathShape(new Rectangle(90, 30), "Frame 2", false);
     Text *txt2 = new Text(*txt1);
     txt2->setName("Text 3");
     txt2->setText("World!");

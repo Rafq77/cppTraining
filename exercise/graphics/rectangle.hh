@@ -16,7 +16,7 @@ class Rectangle : public PathBase
 public:
     Rectangle(double width, double height);
 
-    void preparePath(cairo_t *cr, Position xy) const;
+    void preparePath(cairo_t *cr, Position xy) const override;
 
 private:
     double w;

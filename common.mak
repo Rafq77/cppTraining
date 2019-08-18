@@ -12,6 +12,14 @@
 # This software is provided "as is" without express or implied
 # warranty, and with no claim as to its suitability for any purpose.
 
+ifeq ($(TESTDIR),)
+-include env.mak
+else
+-include $(TESTDIR)/env.mak
+endif
+
+M4_INCLUDE ?= -I$(TOPDIR)/../common
+
 STD ?= -std=c++2a
 COMMFLAGS = -Wall $(STD) -g $(OPT)
 
@@ -21,7 +29,7 @@ TC ?= GCC
 CXXFLAGS += $(COMMFLAGS) $(INCLUDES)
 
 HEADERS ?= $(wildcard *.hh)
-SOURCES ?= $(wildcard *.cc)
+SOURCES += $(wildcard *.cc)
 OBJS ?= $(patsubst %.cc,%.o,$(SOURCES))
 
 ENVCXX := $(shell echo "$$CXX")
@@ -61,9 +69,15 @@ debug release: $(TARGET) $(TARGETS)
 $(TARGET): $(OBJS)
 	$(LINK.cc) $(OBJS) $(LDLIBS) -o $@
 
+%.cc: %.m4
+	m4 $(M4_VARS) $(M4_INCLUDE) $< > $@
+
 
 $(OBJS):: $(HEADERS) $(EXTRA_OBJ_DEPS)
 
 clean: $(CLEAN_EXTRA_DEP)
 	rm -f $(TARGET) $(OBJS) $(PROGS) $(TARGETS) $(CLEAN_EXTRA)
 	rm -f *.o m.depend core out.txt *.ti *.ii *.plg *.ncb *.opt *~
+
+distclean: clean
+	rm -f $(CLEAN_DIST)

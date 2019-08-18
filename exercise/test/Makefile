@@ -23,6 +23,7 @@ TESTDEFS =
 TESTDIR ?= ../graphics
 vpath %.hh $(TESTDIR)
 vpath %.cc $(TESTDIR)
+vpath %.m4 $(TESTDIR)
 
 INCLUDES = -I$(MYDIR) -I$(TESTDIR) -I$(TOPDIR)/include
 CXXFLAGS = -DGRAPHMOCK
@@ -88,4 +89,5 @@ $(TEST_GROUP_SPECIAL_OBJS):: $(HEADERS) Makefile
 wrap-group.o:: group.cc
 
 CLEAN_EXTRA = test-group-special
+CLEAN_DIST = canvas.cc
 include $(TOPDIR)/common.mak

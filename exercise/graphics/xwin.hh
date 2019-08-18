@@ -94,6 +94,9 @@ public:
     std::string const &getName() const;
 
 private:
+    XWin(XWin const &);
+    XWin& operator=(XWin const &);
+
     std::string name;
     XDisplay dpy;
     int scr;

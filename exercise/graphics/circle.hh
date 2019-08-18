@@ -16,7 +16,7 @@ class Circle : public PathBase
 public:
     explicit Circle(double radius);
 
-    void preparePath(cairo_t *cr, Position xy) const;
+    void preparePath(cairo_t *cr, Position xy) const override;
 
 private:
     double r;
