@@ -30,7 +30,7 @@ CXXFLAGS += $(COMMFLAGS) $(INCLUDES)
 
 HEADERS ?= $(wildcard *.hh)
 SOURCES += $(wildcard *.cc)
-OBJS ?= $(patsubst %.cc,%.o,$(SOURCES))
+OBJS ?= $(patsubst %.cc,%.o,$(sort $(SOURCES)))
 
 ENVCXX := $(shell echo "$$CXX")
 
