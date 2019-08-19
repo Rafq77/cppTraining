@@ -88,6 +88,15 @@ struct GroupMock : public Group
     CDtorWrap *cdWrap{&globalCDtor};
 };
 
+struct TestShape : Shape
+{
+    TestShape() = default;
+    TestShape(std::string const &s) : Shape{s} {}
+    void doDraw(cairo_t *context) const override {}
+};
+
+std::string longString = "A pretty long string that should be long enough to not fit into any small string optimization";
+
 #ifdef HAVE_PATH_SHAPE_TEMPL
 #ifdef HAVE_PATH_SHAPE_TEMPL_BOOL
 #define FRAME_INIT new PathShape<Rectangle, false>{Rectangle{70, 30}, "F1"}
@@ -154,12 +163,6 @@ using trompeloeil::_;
 
 extern const lest::test groupTests[] =
 {
-#ifdef _WIN32
-    {CASE("Empty test (to keep VC++ happy)")
-     {
-         EXPECT(testOk());
-     }},
-#else
     {CASE("Group ctor/dtor memory calls must match")
      {
          AllocTracerMock tracer;
@@ -179,9 +182,49 @@ extern const lest::test groupTests[] =
          EXPECT(testAlloc.ok());
          EXPECT(testAlloc.getCount() == 0);
      }},
-#endif
+
 #ifdef HAS_GROUP_MOVE_CTOR
-#ifndef _WIN32
+    {CASE("Shape move ctor must not cause any memory calls")
+     {
+         AllocTracerMock tracer;
+         AllocMock testAlloc;
+         { // we need another scope for memory management
+
+             TestShape sTest{longString};
+             EXPECT(testAlloc.getCount() > 0);
+
+             TestShape s2;
+             s2.~TestShape();
+
+             {
+                 FORBID_CALL(tracer, trackNew(_, _));
+                 FORBID_CALL(tracer, trackDelete(_));
+
+                 TraceSetter ts{testAlloc, &tracer};
+
+                 new (&s2) TestShape{std::move(sTest)};
+             }
+             EXPECT(testOk());
+             // now all acquired resources should be released
+         }
+         EXPECT(testAlloc.ok());
+         EXPECT(testAlloc.getCount() == 0);
+     }},
+
+    {CASE("Group move ctor must move parent")
+     {
+         Position testPos{10, -44.33};
+         GroupMock gTest;
+         gTest.setPosition(testPos);
+
+         GroupMock g2;
+         g2.~GroupMock();
+
+         new (&g2) GroupMock{std::move(gTest)};
+
+         EXPECT(g2.checkPosition(testPos));
+     }},
+
     {CASE("Group move ctor must not cause any memory calls")
      {
          AllocTracerMock tracer;
@@ -234,24 +277,43 @@ extern const lest::test groupTests[] =
          EXPECT(testAlloc.ok());
          EXPECT(testAlloc.getCount() == 0);
      }},
-#endif
-
-    {CASE("Group move ctor must move parent")
-     {
-         Position testPos{10, -44.33};
-         GroupMock gTest;
-         gTest.setPosition(testPos);
-
-         GroupMock g2;
-         g2.~GroupMock();
-
-         new (&g2) Group{std::move(gTest)};
-
-         EXPECT(g2.checkPosition(testPos));
-     }},
 #endif // HAS_GROUP_MOVE_CTOR
 
 #ifdef HAS_GROUP_MOVE_ASSIGNMENT
+    {CASE("Shape move assignment w/ empty target must not cause any memory calls")
+     {
+         AllocTracerMock tracer;
+         AllocMock testAlloc;
+         {
+             TestShape sTest{longString};
+             EXPECT(testAlloc.getCount() > 0);
+
+             TestShape s2;
+             s2.~TestShape();
+
+             // default ctor may cause new
+             {
+                 ALLOW_CALL(tracer, trackNew(_, _));
+                 FORBID_CALL(tracer, trackDelete(_));
+
+                 TraceSetter ts{testAlloc, &tracer};
+
+                 new (&s2) TestShape{};
+             }
+             {
+                 FORBID_CALL(tracer, trackNew(_, _));
+                 ALLOW_CALL(tracer, trackDelete(_));
+
+                 TraceSetter ts{testAlloc, &tracer};
+
+                 s2 = std::move(sTest);
+             }
+             EXPECT(testOk());
+         }
+         EXPECT(testAlloc.ok());
+         EXPECT(testAlloc.getCount() == 0);
+     }},
+
     {CASE("Group move assignment must not use dtor") // as we can't use ctor
      {
          CDtorMock cdMock;
@@ -296,7 +358,6 @@ extern const lest::test groupTests[] =
          EXPECT(g2.checkPosition(testPos));
      }},
 
-#ifndef _WIN32
     {CASE("Group move assignment w/ empty target must not cause any memory calls")
      {
          AllocTracerMock tracer;
@@ -402,7 +463,6 @@ extern const lest::test groupTests[] =
          EXPECT(testAlloc.ok());
          EXPECT(testAlloc.getCount() == 0);
      }},
-#endif
 #endif // HAS_GROUP_MOVE_ASSIGNMENT
 #ifdef HAS_GROUP_GET_SHAPE
     {CASE("Check Group::getShape() for moved children")
