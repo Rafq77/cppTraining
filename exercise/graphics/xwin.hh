@@ -10,6 +10,7 @@
 #include "extgraph.hh"
 #include <string>
 #include <vector>
+#include <functional>
 
 namespace exercise
 {
@@ -85,8 +86,7 @@ public:
     void redraw() const;
     void loop() const;
 
-    template <class FuncT, class ArgT>
-    void registerCallback(FuncT redraw, ArgT);
+    void registerCallback(std::function<void()> fn); 
     void unregisterCallback();
 
     bool compare(Window other) const;
@@ -104,33 +104,10 @@ private:
     int width;
     int height;
     Window win;
-    Redraw *redrawFun;
+	std::function<void()> redrawF = [](){};
 };
 
 typedef XWin GuiWin;
-
-template <class FuncT, class ArgT>
-void XWin::registerCallback(FuncT redraw, ArgT o)
-{
-    struct TypedRedraw : public Redraw
-    {
-        TypedRedraw(FuncT redraw, ArgT obj)
-          : storedRedraw(redraw)
-          , storedObj(obj)
-        {}
-
-        void operator()()
-        {
-            storedRedraw(storedObj);
-        }
-
-        //void (*storedRedraw)(ObjT const *);
-        FuncT storedRedraw;
-        ArgT storedObj;
-    };
-
-    redrawFun = new TypedRedraw(redraw, o);
-}
 
 } // namespace exercise
 #endif /* XWIN_HH_SEEN_ */

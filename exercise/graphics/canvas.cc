@@ -23,7 +23,9 @@ Canvas::Canvas(int width, int height, std::string const &name)
   , surface(win->getSurface())
   , cr(cairo_create(surface))
 {
-    win->registerCallback(std::mem_fun(&Canvas::draw), this);
+    //win->registerCallback([t=this]() { draw(); } );
+    win->registerCallback([t=this]() { t->draw(); });
+    
     (*this) += new PathShape(new Rectangle(width, height), "Background", true, Position(0, 0), Color::White);
     show();
 }

@@ -11,65 +11,38 @@
 
 namespace exercise
 {
-Color::Color()
-  : rgbR(0)
-  , rgbG(0)
-  , rgbB(0)
-{
-}
 
 Color::Color(double red, double green, double blue)
-  : rgbR(red)
-  , rgbG(green)
-  , rgbB(blue)
+  : rgbR{red}
+  , rgbG{green}
+  , rgbB{blue}
 {
 }
 
-Color Color::Black(0, 0, 0);
-Color Color::White(1, 1, 1);
-
-Pen::Pen()
-  : w(2)
-{
-}
+Color Color::Black{0, 0, 0};
+Color Color::White{1, 1, 1};
 
 Pen::Pen(double width)
-  : w(width)
-{
-}
-
-Position::Position()
-  : x(0)
-  , y(0)
+  : w{width}
 {
 }
 
 Position::Position(double xPos, double yPos)
-  : x(xPos)
-  , y(yPos)
-{
-}
-
-Shape::Shape()
-  : xy()
-  , clr()
-  , p()
+  : x{xPos}
+  , y{yPos}
 {
 }
 
 Shape::Shape(std::string const &name_)
-  : xy()
-  , clr()
-  , p()
-  , name(name_)
+  : name{name_}
 {
 }
 
 Shape::Shape(std::string const &name_, Position pos, Color c, Pen pen)
-  : xy(pos)
-  , clr(c)
-  , p(pen)
-  , name(name_)
+  : xy{pos}
+  , clr{c}
+  , p{pen}
+  , name{name_}
 {
 }
 

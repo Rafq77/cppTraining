@@ -89,10 +89,10 @@ bool XDisplayHolder::handleEvent(XEvent &e) const
 {
     if (e.type==Expose && e.xexpose.count<1)
     {
-        std::vector<XWin *>::const_iterator w
-            = std::find_if(winList.begin(), winList.end()
-                           , std::bind2nd(std::mem_fun(&XWin::compare)
-                                          , e.xexpose.window));
+		auto w = std::find_if(winList.begin(), winList.end(), [&e](XWin* x) {
+				return x->compare(e.xexpose.window);
+		});
+
         if (w != winList.end())
         {
             (*w)->redraw();
@@ -157,7 +157,6 @@ XWin::XWin(int w, int h, std::string const &nm)
                             , 1, 1, w, h
                             , 0, BlackPixel(dpy.cPtr(), scr)
                             , WhitePixel(dpy.cPtr(), scr)))
-  , redrawFun(0)
 {
     if (!win)
     {
@@ -174,7 +173,6 @@ XWin::XWin(int w, int h, std::string const &nm)
 
 XWin::~XWin()
 {
-    delete redrawFun;
     XDestroyWindow(dpy.cPtr(), win);
 }
 
@@ -192,10 +190,7 @@ void XWin::show() const
 
 void XWin::redraw() const
 {
-    if (redrawFun)
-    {
-        (*redrawFun)();
-    }
+	redrawF();
 }
 
 void XWin::loop() const
@@ -203,10 +198,14 @@ void XWin::loop() const
     dpy.loop();
 }
 
+void XWin::registerCallback(std::function<void()> fn)
+{ 
+	redrawF = fn;
+}
+
 void XWin::unregisterCallback()
 {
-    delete redrawFun;
-    redrawFun = 0;
+	redrawF = [](){};
 }
 
 bool XWin::compare(Window other) const

@@ -11,9 +11,6 @@
 
 namespace exercise
 {
-Group::Group()
-{
-}
 
 Group::Group(std::string const &name)
   : Shape(name)
@@ -22,16 +19,17 @@ Group::Group(std::string const &name)
 
 Group::~Group()
 {
-    for (SIter i = children.begin(); i != children.end(); ++i)
-    {
-        delete (*i);
-    }
+	//for (Shape* s : children)
+	for (auto s : children) // pointer
+	{
+		delete s;
+	}
 }
 
 void Group::setPosition(Position newPos)
 {
-    double relX = newPos.x - xy.x;
-    double relY = newPos.y - xy.y;
+    auto relX = newPos.x - xy.x;
+    auto relY = newPos.y - xy.y;
 
     move(relX, relY);
 }
@@ -39,27 +37,25 @@ void Group::setPosition(Position newPos)
 void Group::move(double relX, double relY)
 {
     Shape::move(relX, relY);
-    for (SIter i = children.begin(); i != children.end(); ++i)
-    {
-        (*i)->move(relX, relY);
-    }
+	for (auto &s : children) // pointer on shape
+	{
+		s->move(relX, relY);
+	}
 }
 
 void Group::setColor(Color clr)
 {
     Shape::setColor(clr);
-    for (SIter i = children.begin(); i != children.end(); ++i)
-    {
-        (*i)->setColor(clr);
-    }
+
+	apply(clr);
 }
 
 void Group::setPen(Pen p)
 {
     Shape::setPen(p);
-    for (SIter i = children.begin(); i != children.end(); ++i)
+    for (auto &s : children)
     {
-        (*i)->setPen(p);
+        s->setPen(p);
     }
 }
 
@@ -70,7 +66,7 @@ void Group::addChild(Shape *s)
 
 void Group::doDraw(cairo_t *context) const
 {
-    for (std::vector<Shape *>::const_iterator i = children.begin();
+    for (auto i = children.begin();
          i != children.end();
          ++i)
     {

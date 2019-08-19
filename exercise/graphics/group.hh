@@ -10,29 +10,39 @@
 #include "shape.hh"
 #include <vector>
 
+#include <functional>
 #include "group-test.hh"
 
 namespace exercise
 {
+
+
 class Group : public Shape
 {
 public:
-    Group();
+    Group() = default;
     Group(std::string const &name);
+    Group(Group const &) = delete;
+    Group &operator=(Group const &) = delete;
     ~Group();
 
-    virtual void setPosition(Position);
-    virtual void move(double relX, double relY);
-    virtual void setColor(Color);
-    virtual void setPen(Pen);
+    void setPosition(Position) override;
+    void move(double relX, double relY) override;
+    void setColor(Color) override;
+    void setPen(Pen) override;
 
     void addChild(Shape *);
 
 private:
-    Group(Group const &);
-    Group &operator=(Group const &);
 
-    virtual void doDraw(cairo_t *context) const;
+	std::function<void(Color clr)> apply = [this](Color clr) { 
+		for (Shape* s : children)
+		{
+			s->setColor(clr); 
+		}
+	};
+	
+    virtual void doDraw(cairo_t *context) const override;
 
     std::vector<Shape *> children;
     //typedef decltype(children.begin()) SIter; // this would be a reference

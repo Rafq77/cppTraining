@@ -16,8 +16,8 @@ Text::Text(std::string const &txt
            , Position pos
            , Color c
            , Pen pen)
-  : Shape(name, pos, c, pen)
-  , t(txt)
+  : Shape{name, pos, c, pen}
+  , t{txt}
 {
 }
 

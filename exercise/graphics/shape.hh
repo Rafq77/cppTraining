@@ -16,12 +16,12 @@ namespace exercise
 {
 struct Color
 {
-    Color();
+    Color() = default;
     Color(double red, double green, double blue);
 
-    double rgbR;
-    double rgbG;
-    double rgbB;
+    double rgbR{0};
+    double rgbG{0};
+    double rgbB{0};
 
     static Color Black;
     static Color White;
@@ -29,26 +29,26 @@ struct Color
 
 struct Pen
 {
-    Pen();
+    Pen() = default;
     Pen(double width);
 
-    double w;
+    double w{2};
 };
 
 struct Position
 {
-    Position();
+    Position() = default;
     Position(double xPos, double yPos);
 
-    double x;
-    double y;
+    double x{0};
+    double y{0};
 };
 
 
 class Shape
 {
 public:
-    Shape();
+    Shape() = default;
     Shape(std::string const &name);
     Shape(std::string const &name, Position, Color, Pen);
     virtual ~Shape() {}
@@ -64,14 +64,14 @@ public:
     virtual void setPen(Pen);
 
 protected:
-    Position xy;
+    Position xy = Position{};
 
 private:
     virtual void doDraw(cairo_t *context) const = 0;
 
-    Color clr;
-    Pen p;
-    std::string name;
+    Color clr = Color{};
+    Pen p = Pen{};
+    std::string name{};
 };
 } // namespace exercise
 #endif /* SHAPE_HH_SEEN_ */

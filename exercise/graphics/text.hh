@@ -17,14 +17,14 @@ class Text : public Shape
 public:
     Text(std::string const &txt
          , std::string const &name
-         , Position pos = Position()
-         , Color c = Color()
-         , Pen pen = Pen());
+	 , Position pos = Position()
+	 , Color c = Color()
+	 , Pen pen = Pen());
 
     void setText(std::string const &);
 
 private:
-    virtual void doDraw(cairo_t *cr) const;
+    void doDraw(cairo_t *cr) const override;
 
     std::string t;
 };
