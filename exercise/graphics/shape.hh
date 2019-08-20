@@ -30,6 +30,7 @@ struct Color
 struct Pen
 {
     Pen() = default;
+    //Pen(Pen &&p) = default;
     Pen(double width);
 
     double w{2};
@@ -38,6 +39,7 @@ struct Pen
 struct Position
 {
     Position() = default;
+    //Position(Position &&p) = default;
     Position(double xPos, double yPos);
 
     double x{0};
@@ -49,6 +51,9 @@ class Shape
 {
 public:
     Shape() = default;
+    Shape(Shape &s) = default;
+    Shape(Shape &&s) = default;
+    Shape& operator=(Shape &&s) = default;
     Shape(std::string const &name);
     Shape(std::string const &name, Position, Color, Pen);
     virtual ~Shape() {}

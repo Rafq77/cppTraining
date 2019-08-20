@@ -30,18 +30,58 @@ Canvas::Canvas(int width, int height, std::string const &name)
     show();
 }
 
+Canvas::Canvas(Canvas&& other) 
+	: win{std::move(other.win)}
+	, surface{std::move(other.surface)}
+	, cr{std::move(other.cr)}
+	, elems{std::move(other.elems)}
+{
+
+	if (win)
+	{
+		win->unregisterCallback(); 
+		win->registerCallback([t=this]() { t->draw(); });
+	}
+
+	other.win = nullptr;
+	other.surface = nullptr;
+	other.cr = nullptr;
+	other.elems.clear();
+
+}
+
+Canvas& Canvas::operator=(Canvas&& other) 
+{
+	Canvas tmp{std::move(other)};
+
+	std::swap(win, tmp.win);
+	std::swap(surface, tmp.surface);
+	std::swap(cr, tmp.cr);
+	std::swap(elems, tmp.elems);
+
+	if (win) 
+	{
+			win->unregisterCallback(); 
+			win->registerCallback([t=this]() { t->draw(); });
+	}
+
+	return *this;
+};
+
 Canvas::~Canvas()
 {
-    win->unregisterCallback(); // it's the contract
-    for (std::vector<Shape *>::iterator i = elems.begin();
-         i != elems.end();
-         ++i)
-    {
-        delete *i;
-    }
-    cairo_destroy(cr);
-    cairo_surface_destroy(surface);
-    delete win;
+	if (win)
+	{
+			win->unregisterCallback(); // it's the contract
+			cairo_destroy(cr);
+			cairo_surface_destroy(surface);
+			delete win;
+	}
+
+	for (auto e: elems) 
+	{
+			delete e;
+	}
 }
 
 void Canvas::operator+=(Shape *s)

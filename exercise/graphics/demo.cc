@@ -16,8 +16,8 @@
 #include <vector>
 #include <utility>
 
-//#define GROUP_MOVE 1
-//#define CANVAS_MOVE 1
+#define GROUP_MOVE 1
+#define CANVAS_MOVE 1
 
 using namespace exercise;
 

@@ -17,9 +17,24 @@ Group::Group(std::string const &name)
 {
 }
 
+Group::Group(Group &&other) noexcept 
+  : Shape{std::move(other)}
+  , children{std::move(other.children)}
+{
+	other.children.clear();
+}
+
+Group& Group::operator=(Group &&other)  noexcept
+{
+	Group tmp{std::move(other)};
+	Shape::operator=(std::move(tmp));
+	std::swap(children, tmp.children);
+
+	return *this;
+}
+
 Group::~Group()
 {
-	//for (Shape* s : children)
 	for (auto s : children) // pointer
 	{
 		delete s;
@@ -38,13 +53,6 @@ void Group::move(double relX, double relY)
 {
     Shape::move(relX, relY);
     apply([=](Shape *s) { s->move(relX, relY); });
-	// TODO
-	/*
-	for (auto &s : children) // pointer on shape
-	{
-		s->move(relX, relY);
-	}
-	*/
 }
 
 void Group::setColor(Color clr)

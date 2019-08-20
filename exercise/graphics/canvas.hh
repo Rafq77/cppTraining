@@ -20,6 +20,10 @@ namespace exercise
 class Canvas
 {
 public:
+	Canvas(Canvas&& other);
+    Canvas(Canvas const&) = delete;
+	Canvas& operator=(Canvas&& other);
+    Canvas& operator=(Canvas const&) = delete;
     Canvas(int width, int height, std::string const &name);
     ~Canvas();
 
@@ -30,8 +34,6 @@ public:
     void startLoop();
 
 private:
-    Canvas(Canvas const&);
-    Canvas& operator=(Canvas const&);
 
     GuiWin *win;
     cairo_surface_t *surface;

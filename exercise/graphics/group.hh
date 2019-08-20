@@ -22,6 +22,12 @@ class Group : public Shape
 public:
     Group() = default;
     Group(std::string const &name);
+    
+    // TODO move ctor, move assignment, use tests. 
+    // pro-tip: expect living with an empty object (this).
+    Group(Group &&) noexcept; //mctor
+    Group &operator=(Group &&) noexcept; // massign // noexcept?
+
     Group(Group const &) = delete;
     Group &operator=(Group const &) = delete;
     ~Group();
