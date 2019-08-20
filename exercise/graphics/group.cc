@@ -37,26 +37,26 @@ void Group::setPosition(Position newPos)
 void Group::move(double relX, double relY)
 {
     Shape::move(relX, relY);
+    apply([=](Shape *s) { s->move(relX, relY); });
+	// TODO
+	/*
 	for (auto &s : children) // pointer on shape
 	{
 		s->move(relX, relY);
 	}
+	*/
 }
 
 void Group::setColor(Color clr)
 {
     Shape::setColor(clr);
-
-	apply(clr);
+	apply([=](Shape *s ){s->setColor(clr);});
 }
 
 void Group::setPen(Pen p)
 {
     Shape::setPen(p);
-    for (auto &s : children)
-    {
-        s->setPen(p);
-    }
+	apply([&](Shape *s ){s->setPen(p);});
 }
 
 void Group::addChild(Shape *s)

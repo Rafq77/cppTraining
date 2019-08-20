@@ -89,8 +89,8 @@ bool XDisplayHolder::handleEvent(XEvent &e) const
 {
     if (e.type==Expose && e.xexpose.count<1)
     {
-		auto w = std::find_if(winList.begin(), winList.end(), [&e](XWin* x) {
-				return x->compare(e.xexpose.window);
+		auto w = std::find_if(winList.begin(), winList.end(), [win=e.xexpose.window](XWin* x) {
+				return x->compare(win);
 		});
 
         if (w != winList.end())
@@ -190,7 +190,8 @@ void XWin::show() const
 
 void XWin::redraw() const
 {
-	redrawF();
+	if (redrawF)
+		redrawF();
 }
 
 void XWin::loop() const
@@ -205,7 +206,8 @@ void XWin::registerCallback(std::function<void()> fn)
 
 void XWin::unregisterCallback()
 {
-	redrawF = [](){};
+	//redrawF = [](){};
+	redrawF = nullptr;
 }
 
 bool XWin::compare(Window other) const

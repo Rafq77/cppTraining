@@ -104,7 +104,7 @@ private:
     int width;
     int height;
     Window win;
-	std::function<void()> redrawF = [](){};
+	std::function<void()> redrawF = nullptr;
 };
 
 typedef XWin GuiWin;

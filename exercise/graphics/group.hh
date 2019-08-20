@@ -35,12 +35,23 @@ public:
 
 private:
 
-	std::function<void(Color clr)> apply = [this](Color clr) { 
+	/*
+	std::function<void(Color clr)> apply = [&](Color clr) { 
 		for (Shape* s : children)
 		{
 			s->setColor(clr); 
 		}
 	};
+	*/
+
+	template <class F>
+	void apply(F f)
+	{
+		for (Shape *s : children)
+		{
+			f(s);
+		}
+	}
 	
     virtual void doDraw(cairo_t *context) const override;
 
