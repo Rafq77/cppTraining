@@ -988,12 +988,12 @@ extern const lest::test canvasTests[] =
          auto t2 = new Text{"World", "Text2"};
 
          c += t1;
-         EXPECT(c.getShape("Text1").get() == t1);
-         EXPECT(c.getShape("Text2").get() == nullptr);
+         EXPECT(&(c.getShape("Text1")->get()) == t1);
+         EXPECT(c.getShape("Text2").has_value() == false);
 
          *t1 = std::move(*t2);
-         EXPECT(c.getShape("Text2").get() == t1);
-         EXPECT(c.getShape("Text1").get() == nullptr);
+         EXPECT(&(c.getShape("Text2")->get()) == t1);
+         EXPECT(c.getShape("Text1").has_value() == false);
      }},
 #endif // HAS_CANVAS_GET_SHAPE
 };
