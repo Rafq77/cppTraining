@@ -10,6 +10,7 @@
 
 #include "extgraph.hh" // we need cairo_t
 
+#include <memory>
 #include <string>
 
 namespace exercise
@@ -46,10 +47,10 @@ struct Position
     double y{0};
 };
 
-
 class Shape
 {
 public:
+
     Shape() = default;
     Shape(Shape &s) = default;
     Shape(Shape &&s) = default;
@@ -78,5 +79,9 @@ private:
     Pen p = Pen{};
     std::string name{};
 };
+
+//typedef std::unique_ptr<Shape> UPShape;
+using UPShape = std::unique_ptr<Shape>;
+
 } // namespace exercise
 #endif /* SHAPE_HH_SEEN_ */

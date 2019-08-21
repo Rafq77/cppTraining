@@ -18,7 +18,7 @@
 
 namespace exercise
 {
-Canvas::Canvas(int width, int height, std::string const &name)
+CanvasImpl::CanvasImpl(int width, int height, std::string const &name)
   : win(new GuiWin(width, height, name))
   , surface(win->getSurface())
   , cr(cairo_create(surface))
@@ -30,7 +30,7 @@ Canvas::Canvas(int width, int height, std::string const &name)
     show();
 }
 
-Canvas::Canvas(Canvas&& other) 
+CanvasImpl::CanvasImpl(CanvasImpl&& other) 
 	: win{std::move(other.win)}
 	, surface{std::move(other.surface)}
 	, cr{std::move(other.cr)}
@@ -50,9 +50,9 @@ Canvas::Canvas(Canvas&& other)
 
 }
 
-Canvas& Canvas::operator=(Canvas&& other) 
+CanvasImpl& CanvasImpl::operator=(CanvasImpl&& other) 
 {
-	Canvas tmp{std::move(other)};
+	CanvasImpl tmp{std::move(other)};
 
 	std::swap(win, tmp.win);
 	std::swap(surface, tmp.surface);
@@ -68,46 +68,68 @@ Canvas& Canvas::operator=(Canvas&& other)
 	return *this;
 };
 
-Canvas::~Canvas()
+CanvasImpl::~CanvasImpl()
 {
 	if (win)
 	{
-			win->unregisterCallback(); // it's the contract
-			cairo_destroy(cr);
-			cairo_surface_destroy(surface);
-			delete win;
+		win->unregisterCallback(); // it's the contract
+		cairo_destroy(cr);
+		cairo_surface_destroy(surface);
+		delete win;
 	}
+}
 
-	for (auto e: elems) 
+void CanvasImpl::operator+=(Shape *s)
+{
+    elems.emplace_back(s);
+}
+
+void CanvasImpl::draw() const
+{
+	for (auto &s : elems)
 	{
-			delete e;
+		s->draw(cr);
 	}
-}
 
-void Canvas::operator+=(Shape *s)
-{
-    elems.push_back(s);
-}
-
-void Canvas::draw() const
-{
-    for (std::vector<Shape *>::const_iterator i = elems.begin();
-    i != elems.end();
-        ++i)
-    {
-        (*i)->draw(cr);
-    }
     cairo_show_page(cr);
 }
 
-void Canvas::show() const
+void CanvasImpl::show() const
 {
     draw();
     win->show();
 }
 
-void Canvas::startLoop()
+void CanvasImpl::startLoop()
 {
     win->loop();
 }
+
+Canvas::Canvas(int width, int height, std::string const &name)
+  : pImpl{new CanvasImpl{width, height, name}}
+{
+}
+
+void Canvas::operator+=(Shape *s)
+{
+    (*pImpl) += s;
+}
+
+void Canvas::draw() const
+{
+    pImpl->draw();
+}
+
+void Canvas::show() const
+{
+    pImpl->show();
+}
+
+void Canvas::startLoop()
+{
+    pImpl->startLoop();
+}
+
+
+
 } // namespace exercise

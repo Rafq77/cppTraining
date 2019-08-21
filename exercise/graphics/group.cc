@@ -13,32 +13,8 @@ namespace exercise
 {
 
 Group::Group(std::string const &name)
-  : Shape(name)
+  : Shape{name}
 {
-}
-
-Group::Group(Group &&other) noexcept 
-  : Shape{std::move(other)}
-  , children{std::move(other.children)}
-{
-	other.children.clear();
-}
-
-Group& Group::operator=(Group &&other)  noexcept
-{
-	Group tmp{std::move(other)};
-	Shape::operator=(std::move(tmp));
-	std::swap(children, tmp.children);
-
-	return *this;
-}
-
-Group::~Group()
-{
-	for (auto s : children) // pointer
-	{
-		delete s;
-	}
 }
 
 void Group::setPosition(Position newPos)
@@ -52,33 +28,32 @@ void Group::setPosition(Position newPos)
 void Group::move(double relX, double relY)
 {
     Shape::move(relX, relY);
-    apply([=](Shape *s) { s->move(relX, relY); });
+    apply([=](UPShape& s) { s->move(relX, relY); });
 }
 
 void Group::setColor(Color clr)
 {
     Shape::setColor(clr);
-	apply([=](Shape *s ){s->setColor(clr);});
+	apply([=](UPShape& s ){s->setColor(clr);});
 }
 
 void Group::setPen(Pen p)
 {
     Shape::setPen(p);
-	apply([&](Shape *s ){s->setPen(p);});
+	apply([&](UPShape& s ){s->setPen(p);});
 }
 
 void Group::addChild(Shape *s)
 {
-    children.push_back(s);
+    children.emplace_back(s);
 }
 
 void Group::doDraw(cairo_t *context) const
 {
-    for (auto i = children.begin();
-         i != children.end();
-         ++i)
-    {
-        (*i)->draw(context);
-    }
+	for (auto& c : children)
+	{
+		c->draw(context);
+	}
 }
+
 } // namespace exercise

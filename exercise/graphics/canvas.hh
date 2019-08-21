@@ -16,16 +16,17 @@
 
 
 namespace exercise
+
 {
-class Canvas
+class CanvasImpl
 {
 public:
-	Canvas(Canvas&& other);
-    Canvas(Canvas const&) = delete;
-	Canvas& operator=(Canvas&& other);
-    Canvas& operator=(Canvas const&) = delete;
-    Canvas(int width, int height, std::string const &name);
-    ~Canvas();
+	CanvasImpl(CanvasImpl&& other);
+    CanvasImpl(CanvasImpl const&) = delete;
+	CanvasImpl& operator=(CanvasImpl&& other);
+    CanvasImpl& operator=(CanvasImpl const&) = delete;
+    CanvasImpl(int width, int height, std::string const &name);
+    ~CanvasImpl();
 
     void operator+=(Shape *);
 
@@ -38,7 +39,32 @@ private:
     GuiWin *win;
     cairo_surface_t *surface;
     cairo_t *cr;
-    std::vector<Shape *> elems;
+    std::vector<UPShape> elems;
 };
+
+class Canvas
+{
+public:
+    Canvas(int width, int height, std::string const &name);
+    Canvas() = default;
+    Canvas(Canvas&) = default;
+    Canvas(Canvas&&) = default;
+    Canvas& operator=(Canvas&) = default;
+    Canvas& operator=(Canvas&&) = default;
+    ~Canvas() = default;
+
+    Canvas(Canvas const&) = delete;
+    Canvas& operator=(Canvas const&) = delete;
+
+    void operator+=(Shape *);
+
+    void draw() const;
+    void show() const;
+    void startLoop();
+
+private:
+	std::unique_ptr<CanvasImpl> pImpl;
+};
+
 } // namespace exercise
 #endif /* CANVAS_HH_SEEN_ */

@@ -20,18 +20,16 @@ namespace exercise
 class Group : public Shape
 {
 public:
-    Group() = default;
+    // Ro0 - no std ctors and dtor
+	Group() = default;
+	Group(Group&) = default; // cctor
+	Group(Group&&) = default; //mvctor
+	Group& operator=(Group&) = default; // cassign
+	Group& operator=(Group&&) = default; // massign
+	~Group() = default;
+
     Group(std::string const &name);
     
-    // TODO move ctor, move assignment, use tests. 
-    // pro-tip: expect living with an empty object (this).
-    Group(Group &&) noexcept; //mctor
-    Group &operator=(Group &&) noexcept; // massign // noexcept?
-
-    Group(Group const &) = delete;
-    Group &operator=(Group const &) = delete;
-    ~Group();
-
     void setPosition(Position) override;
     void move(double relX, double relY) override;
     void setColor(Color) override;
@@ -41,19 +39,10 @@ public:
 
 private:
 
-	/*
-	std::function<void(Color clr)> apply = [&](Color clr) { 
-		for (Shape* s : children)
-		{
-			s->setColor(clr); 
-		}
-	};
-	*/
-
 	template <class F>
 	void apply(F f)
 	{
-		for (Shape *s : children)
+		for (auto& s : children)
 		{
 			f(s);
 		}
@@ -61,12 +50,15 @@ private:
 	
     virtual void doDraw(cairo_t *context) const override;
 
-    std::vector<Shape *> children;
+	// UPShape def moved to shape.hh
+    std::vector<UPShape> children;
+
     //typedef decltype(children.begin()) SIter; // this would be a reference
-    typedef std::vector<Shape *>::iterator SIter;
+    typedef std::vector<UPShape>::iterator SIter;
 
 public:
     typedef decltype(children)::value_type testElemType;
 };
+
 } // namespace exercise
 #endif /* GROUP_HH_SEEN_ */
