@@ -472,12 +472,12 @@ extern const lest::test groupTests[] =
          auto t2 = new Text{"World", "Text2"};
 
          g.addChild(t1);
-         EXPECT(g.getShape("Text1").get() == t1);
-         EXPECT(g.getShape("Text2").get() == nullptr);
+         EXPECT(&(g.getShape("Text1")->get()) == t1);
+         EXPECT(g.getShape("Text2").has_value() == false);
 
          *t1 = std::move(*t2);
-         EXPECT(g.getShape("Text2").get() == t1);
-         EXPECT(g.getShape("Text1").get() == nullptr);
+         EXPECT(&(g.getShape("Text2")->get()) == t1);
+         EXPECT(g.getShape("Text1").has_value() == false);
      }},
 #endif // HAS_GROUP_GET_SHAPE
 };
