@@ -19,11 +19,15 @@
 namespace exercise
 {
 CanvasImpl::CanvasImpl(int width, int height, std::string const &name)
-  : win(new GuiWin(width, height, name))
-  , surface(win->getSurface())
-  , cr(cairo_create(surface))
+  : win{new GuiWin(width, height, name)}
+  //: win{new GuiWin(width, height, name), [](GuiWin* g){ g->unregisterCallback(); delete g; }} // this is not effective, because unregister is being called too late!
+  , surface{win->getSurface(), cairo_surface_destroy}
+  //, surface{win->getSurface(), [](cairo_surface_t *c) {cairo_surface_destroy(c);} }
+  //, cr{cairo_create(surface.get()), cairo_destroy} // works as well
+  , cr{cairo_create(surface.get()), [](cairo_t *c) { cairo_destroy(c);} }
+  //, cr{cairo_create(surface.get()), [&](cairo_t *c) { this->win->uniregisterCallback(); cairo_destroy(c);} } // Problem, because I am using ´this´, which will be invalid after moving the object.
+  , helperClass{[w=win.get()](){ w->unregisterCallback();}}  // for cleaniness i wanted to use the helper class for callback management. But instead, use the helper to unregister only.
 {
-    //win->registerCallback([t=this]() { draw(); } );
     win->registerCallback([t=this]() { t->draw(); });
     
     (*this) += new PathShape(new Rectangle(width, height), "Background", true, Position(0, 0), Color::White);
@@ -43,11 +47,7 @@ CanvasImpl::CanvasImpl(CanvasImpl&& other)
 		win->registerCallback([t=this]() { t->draw(); });
 	}
 
-	other.win = nullptr;
-	other.surface = nullptr;
-	other.cr = nullptr;
 	other.elems.clear();
-
 }
 
 CanvasImpl& CanvasImpl::operator=(CanvasImpl&& other) 
@@ -68,17 +68,6 @@ CanvasImpl& CanvasImpl::operator=(CanvasImpl&& other)
 	return *this;
 };
 
-CanvasImpl::~CanvasImpl()
-{
-	if (win)
-	{
-		win->unregisterCallback(); // it's the contract
-		cairo_destroy(cr);
-		cairo_surface_destroy(surface);
-		delete win;
-	}
-}
-
 void CanvasImpl::operator+=(Shape *s)
 {
     elems.emplace_back(s);
@@ -88,10 +77,10 @@ void CanvasImpl::draw() const
 {
 	for (auto &s : elems)
 	{
-		s->draw(cr);
+		s->draw(cr.get());
 	}
 
-    cairo_show_page(cr);
+    cairo_show_page(cr.get());
 }
 
 void CanvasImpl::show() const
@@ -104,6 +93,8 @@ void CanvasImpl::startLoop()
 {
     win->loop();
 }
+
+/////////////////// Canvas class
 
 Canvas::Canvas(int width, int height, std::string const &name)
   : pImpl{new CanvasImpl{width, height, name}}

@@ -16,8 +16,17 @@
 
 
 namespace exercise
-
 {
+
+struct CanvasHelperClass
+{
+		~CanvasHelperClass()
+		{
+				fn();
+		}
+		std::function<void()> fn = [](){};
+};
+
 class CanvasImpl
 {
 public:
@@ -26,7 +35,6 @@ public:
 	CanvasImpl& operator=(CanvasImpl&& other);
     CanvasImpl& operator=(CanvasImpl const&) = delete;
     CanvasImpl(int width, int height, std::string const &name);
-    ~CanvasImpl();
 
     void operator+=(Shape *);
 
@@ -36,10 +44,11 @@ public:
 
 private:
 
-    GuiWin *win;
-    cairo_surface_t *surface;
-    cairo_t *cr;
+    std::unique_ptr<GuiWin> win; 
+    std::unique_ptr<cairo_surface_t, std::function<void(cairo_surface_t *)>> surface;
+    std::unique_ptr<cairo_t, std::function<void(cairo_t *)>> cr;
     std::vector<UPShape> elems;
+	CanvasHelperClass helperClass;
 };
 
 class Canvas
