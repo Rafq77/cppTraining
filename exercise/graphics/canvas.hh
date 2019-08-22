@@ -48,6 +48,7 @@ private:
     std::unique_ptr<cairo_surface_t, std::function<void(cairo_surface_t *)>> surface;
     std::unique_ptr<cairo_t, std::function<void(cairo_t *)>> cr;
     std::vector<UPShape> elems;
+	// CanvasHelperClass helperCallback;
 	CanvasHelperClass helperClass;
 };
 

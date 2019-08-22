@@ -157,6 +157,7 @@ XWin::XWin(int w, int h, std::string const &nm)
                             , 1, 1, w, h
                             , 0, BlackPixel(dpy.cPtr(), scr)
                             , WhitePixel(dpy.cPtr(), scr)))
+  , helper{[this](){ XDestroyWindow(dpy.cPtr(), win);}}
 {
     if (!win)
     {
@@ -169,11 +170,6 @@ XWin::XWin(int w, int h, std::string const &nm)
     // wait for Expose event before drawing anything
     XMapWindow(dpy.cPtr(), win);
     dpy->waitExpose(win);
-}
-
-XWin::~XWin()
-{
-    XDestroyWindow(dpy.cPtr(), win);
 }
 
 cairo_surface_t *XWin::getSurface()

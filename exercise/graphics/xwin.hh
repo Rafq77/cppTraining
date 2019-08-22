@@ -75,11 +75,21 @@ public:
     virtual void operator()() = 0;
 };
 
+
+struct DeleterHelper
+{
+		~DeleterHelper()
+		{
+				fn();
+		}
+		std::function<void()> fn = [](){};
+};
+
+
 class XWin
 {
 public:
     XWin(int width, int height, std::string const &name);
-    ~XWin();
 
     cairo_surface_t *getSurface();
     void show() const;
@@ -105,6 +115,7 @@ private:
     int height;
     Window win;
 	std::function<void()> redrawF = nullptr;
+	DeleterHelper helper;
 };
 
 typedef XWin GuiWin;

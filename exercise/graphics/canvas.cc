@@ -20,13 +20,14 @@ namespace exercise
 {
 CanvasImpl::CanvasImpl(int width, int height, std::string const &name)
   : win{new GuiWin(width, height, name)}
-  //: win{new GuiWin(width, height, name), [](GuiWin* g){ g->unregisterCallback(); delete g; }} // this is not effective, because unregister is being called too late!
   , surface{win->getSurface(), cairo_surface_destroy}
+  , cr{cairo_create(surface.get()), [](cairo_t *c) { cairo_destroy(c);} }
+  //, helperCallback{[t=this](){ t->draw();}}   // attempt, not final solution
+  , helperClass{[w=win.get()](){ w->unregisterCallback();}}  // for cleaniness i wanted to use the helper class for callback management. But instead, use the helper to unregister only.
+  //: win{new GuiWin(width, height, name), [](GuiWin* g){ g->unregisterCallback(); delete g; }} // this is not effective, because unregister is being called too late!
   //, surface{win->getSurface(), [](cairo_surface_t *c) {cairo_surface_destroy(c);} }
   //, cr{cairo_create(surface.get()), cairo_destroy} // works as well
-  , cr{cairo_create(surface.get()), [](cairo_t *c) { cairo_destroy(c);} }
   //, cr{cairo_create(surface.get()), [&](cairo_t *c) { this->win->uniregisterCallback(); cairo_destroy(c);} } // Problem, because I am using ´this´, which will be invalid after moving the object.
-  , helperClass{[w=win.get()](){ w->unregisterCallback();}}  // for cleaniness i wanted to use the helper class for callback management. But instead, use the helper to unregister only.
 {
     win->registerCallback([t=this]() { t->draw(); });
     
