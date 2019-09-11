@@ -10,6 +10,8 @@
 
 #include "extgraph.hh" // we need cairo_t
 
+#include <optional>
+#include <functional>
 #include <memory>
 #include <string>
 
@@ -82,6 +84,7 @@ private:
 
 //typedef std::unique_ptr<Shape> UPShape;
 using UPShape = std::unique_ptr<Shape>;
+using OptionalShapeRef = std::optional<std::reference_wrapper<Shape>>;
 
 } // namespace exercise
 #endif /* SHAPE_HH_SEEN_ */

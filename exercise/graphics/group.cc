@@ -46,6 +46,21 @@ void Group::setPen(Pen p)
 void Group::addChild(Shape *s)
 {
     children.emplace_back(s);
+// getName is from shape
+// but get is from uniquePtr
+	shapeMap[children.back()->getName()] = children.back().get();
+}
+
+OptionalShapeRef Group::getShape(const std::string& name)
+{
+	if (auto shapeIt = shapeMap.find(name); shapeIt != shapeMap.end()) 
+	{
+		auto const & [key, value] = *shapeIt;
+		return OptionalShapeRef(*value); 
+	} else 
+	{
+		return OptionalShapeRef();
+	}
 }
 
 void Group::doDraw(cairo_t *context) const

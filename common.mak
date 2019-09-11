@@ -36,7 +36,8 @@ ENVCXX := $(shell echo "$$CXX")
 
 ifeq ($(TC), GCC)
 ifeq ($(ENVCXX),)
-CXX = g++
+# CXX = g++
+CXX = g++-8
 endif
 endif
 

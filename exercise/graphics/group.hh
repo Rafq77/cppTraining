@@ -10,7 +10,9 @@
 #include "shape.hh"
 #include <vector>
 
+#include <optional>
 #include <functional>
+#include <unordered_map>
 #include "group-test.hh"
 
 namespace exercise
@@ -30,12 +32,14 @@ public:
 
     Group(std::string const &name);
     
+
     void setPosition(Position) override;
     void move(double relX, double relY) override;
     void setColor(Color) override;
     void setPen(Pen) override;
 
     void addChild(Shape *);
+	OptionalShapeRef getShape(const std::string& name);
 
 private:
 
@@ -49,6 +53,8 @@ private:
 	}
 	
     virtual void doDraw(cairo_t *context) const override;
+
+	std::unordered_map<std::string, Shape*> shapeMap; // name is key, val is the address from vector of unique_ptr 
 
 	// UPShape def moved to shape.hh
     std::vector<UPShape> children;

@@ -11,6 +11,7 @@
 #include "extgraph.hh"
 #include "xwin.hh"
 
+#include <optional>
 #include <vector>
 #include <string>
 
@@ -42,12 +43,15 @@ public:
     void show() const;
     void startLoop();
 
+	OptionalShapeRef getShape(const std::string& name);
+
 private:
 
     std::unique_ptr<GuiWin> win; 
     std::unique_ptr<cairo_surface_t, std::function<void(cairo_surface_t *)>> surface;
     std::unique_ptr<cairo_t, std::function<void(cairo_t *)>> cr;
     std::vector<UPShape> elems;
+	std::unordered_map<std::string, Shape*> shapeMap; // name is key, val is the address from vector of unique_ptr 
 	// CanvasHelperClass helperCallback;
 	CanvasHelperClass helperClass;
 };
@@ -65,6 +69,8 @@ public:
 
     Canvas(Canvas const&) = delete;
     Canvas& operator=(Canvas const&) = delete;
+
+	OptionalShapeRef getShape(const std::string& name);
 
     void operator+=(Shape *);
 

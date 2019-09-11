@@ -15,11 +15,27 @@
 #include <unistd.h>
 #include <vector>
 #include <utility>
+#include <exception>
+#include <thread>
+#include <chrono>
 
 #define GROUP_MOVE 1
 #define CANVAS_MOVE 1
 
 using namespace exercise;
+// using namespace std::literals;
+// using std::literals::s;
+constexpr std::chrono::seconds sec1(1);
+
+Group& getShapeFromOptional(OptionalShapeRef optRef)
+{
+	if (optRef) 
+	{
+		return dynamic_cast<Group&>(optRef->get()); // reference wrapper 
+	}
+	throw std::runtime_error("Extracting from shape went horribly wrong!");
+}
+
 
 #ifdef CANVAS_MOVE
 std::vector<Canvas> allC;
@@ -30,7 +46,7 @@ void showAndAdd(Canvas &&c)
 
     c.show();
     allC.push_back(move(c));
-    sleep(1);
+    std::this_thread::sleep_for(sec1);
 }
 
 void showAll()
@@ -98,11 +114,11 @@ int main()
     Shape *crcl = new PathShape{new Circle(100), "Circle", true, Position(320, 240), Color(0, 0, 0.5)};
     c1 += crcl;
     c1.show();
-    sleep(1);
+    std::this_thread::sleep_for(sec1);
 
     crcl->setColor(Color{0.5, 0, 0});
     c1.show();
-    sleep(1);
+    std::this_thread::sleep_for(sec1);
 
     Text txtBase{"Hello", "TextBase", Position(20, 20)};
     Rectangle frameBase{70, 30};
@@ -111,45 +127,48 @@ int main()
     txt->setText("Hello 1");
     txt->setName("Text 1");
     Shape *frame = new PathShape{new Rectangle(frameBase), "Frame 1", false};
-    Group *g1 = new Group{"Group 1"};
-    g1->addChild(txt);
-    g1->addChild(frame);
-    g1->move(50, 20);
-    c1 += g1;
+    Group *g = new Group{"Group 1"};
+    g->addChild(txt);
+    g->addChild(frame);
+    g->move(50, 20);
+    c1 += g;
 
     txt = new Text{txtBase};
     txt->setText("Hello 2");
     txt->setName("Text 2");
     frame = new PathShape{new Rectangle(frameBase), "Frame 2", false};
-    Group *g2 = new Group{"Group 2"};
-    g2->addChild(txt);
-    g2->addChild(frame);
-    g2->move(520, 430);
-    c1 += g2;
+    g = new Group{"Group 2"};
+    g->addChild(txt);
+    g->addChild(frame);
+    g->move(520, 430);
+    c1 += g;
 
     txt = new Text{txtBase};
     txt->setText("Hello 3");
     txt->setName("Text 3");
     frame = new PathShape{new Rectangle(frameBase), "Frame 3", false};
-    Group *g3 = new Group{"Group 3"};
-    g3->addChild(txt);
-    g3->addChild(frame);
-    g3->move(290, 430);
-    c1 += g3;
+    g = new Group{"Group 3"};
+    g->addChild(txt);
+    g->addChild(frame);
+    g->move(290, 430);
+    c1 += g;
 
     c1.show();
     sleep(1);
 
-    g1->setColor(Color{1, 0, 0});
-    g2->setColor(Color{0, 1, 0});
-    g3->setColor(Color{0, 0, 1});
+	Group& g1 = getShapeFromOptional(c1.getShape("Group 1"));
+	Group& g2 = getShapeFromOptional(c1.getShape("Group 2"));
+	Group& g3 = getShapeFromOptional(c1.getShape("Group 3"));
+	g1.setColor(Color{1, 0, 0});
+    g2.setColor(Color{0, 1, 0});
+    g3.setColor(Color{0, 0, 1});
 
     c1.show();
     sleep(1);
 
-    g1->move(50, 20);
-    g2->move(-50, -20);
-    g3->move(-60, -300);
+    g1.move(50, 20);
+    g2.move(-50, -20);
+    g3.move(-60, -300);
     c1.show();
 
 #ifdef GROUP_MOVE
@@ -171,20 +190,22 @@ int main()
     c2.show();
     sleep(1);
 
-    std::swap(*g1, *g4);
+    std::swap(g1, *g4);
     c1.show();
     c2.show();
 #ifdef CANVAS_MOVE
     showAndAdd(move(c1));
 
+// TODO call correctly here
     Group *crclTxt = circleWin();
+	
     textWin();
 
     allC[2] = move(c2);
     showAll();
     sleep(2);
 
-    *crclTxt = move(*g3);
+    *crclTxt = move(g3);
     showAll();
     sleep(2);
 

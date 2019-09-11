@@ -40,6 +40,7 @@ CanvasImpl::CanvasImpl(CanvasImpl&& other)
 	, surface{std::move(other.surface)}
 	, cr{std::move(other.cr)}
 	, elems{std::move(other.elems)}
+	, shapeMap{std::move(other.shapeMap)}
 {
 
 	if (win)
@@ -59,6 +60,7 @@ CanvasImpl& CanvasImpl::operator=(CanvasImpl&& other)
 	std::swap(surface, tmp.surface);
 	std::swap(cr, tmp.cr);
 	std::swap(elems, tmp.elems);
+	std::swap(shapeMap, tmp.shapeMap);
 
 	if (win) 
 	{
@@ -72,6 +74,7 @@ CanvasImpl& CanvasImpl::operator=(CanvasImpl&& other)
 void CanvasImpl::operator+=(Shape *s)
 {
     elems.emplace_back(s);
+	shapeMap[elems.back()->getName()] = elems.back().get();
 }
 
 void CanvasImpl::draw() const
@@ -93,6 +96,18 @@ void CanvasImpl::show() const
 void CanvasImpl::startLoop()
 {
     win->loop();
+}
+
+OptionalShapeRef CanvasImpl::getShape(const std::string& name)
+{
+	if (auto shapeIt = shapeMap.find(name); shapeIt != shapeMap.end()) 
+	{
+		auto const & [key, value] = *shapeIt;
+		return OptionalShapeRef(*value); 
+	} else 
+	{
+		return OptionalShapeRef();
+	}
 }
 
 /////////////////// Canvas class
@@ -122,6 +137,10 @@ void Canvas::startLoop()
     pImpl->startLoop();
 }
 
+OptionalShapeRef Canvas::getShape(const std::string& name)
+{
+	return pImpl->getShape(name);
+}
 
 
 } // namespace exercise
