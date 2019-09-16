@@ -36,6 +36,16 @@ Group& getShapeFromOptional(OptionalShapeRef optRef)
 	throw std::runtime_error("Extracting from shape went horribly wrong!");
 }
 
+// template could go here
+Group& getShapeFromOptional(Canvas& c, std::string name)
+{
+    OptionalShapeRef optRef = c.getShape(name);
+	if (optRef) 
+	{
+		return dynamic_cast<Group&>(optRef->get()); // reference wrapper 
+	}
+	throw std::runtime_error("Extracting from shape went horribly wrong!");
+}
 
 #ifdef CANVAS_MOVE
 std::vector<Canvas> allC;
@@ -57,7 +67,7 @@ void showAll()
     }
 }
 
-Group *circleWin()
+void circleWin()
 {
     using std::move;
 
@@ -79,8 +89,6 @@ Group *circleWin()
     c += g;
 
     showAndAdd(move(c));
-
-    return g;
 }
 
 void textWin()
@@ -196,18 +204,18 @@ int main()
 #ifdef CANVAS_MOVE
     showAndAdd(move(c1));
 
-// TODO call correctly here
-    Group *crclTxt = circleWin();
-	
+    circleWin();
+
     textWin();
 
     allC[2] = move(c2);
     showAll();
-    sleep(2);
+    std::this_thread::sleep_for(2*sec1);
 
-    *crclTxt = move(g3);
+    Group &crclTxt = getShapeFromOptional(allC[1], "Group 1");
+    crclTxt = move(g3);
     showAll();
-    sleep(2);
+    std::this_thread::sleep_for(2*sec1);
 
     allC[0].startLoop();
 
