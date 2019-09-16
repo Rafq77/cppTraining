@@ -1,0 +1,162 @@
+/*
+ * Copyright (c) 2014-2019 Detlef Vollmann, vollmann engineering gmbh
+ *
+ * Distributed under the Boost Software License, Version 1.0.
+ * (See accompanying file LICENSE_1_0.txt or copy at
+ * http://www.boost.org/LICENSE_1_0.txt)
+ */
+
+#include "staticVector.hh"
+
+#include <new>
+#include <exception>
+#include <stdexcept>
+#include <sstream>
+
+namespace exercise
+{
+template <class T>
+StaticVector<T>::StaticVector(size_t sz)
+  : dataSize{sz}
+  , data{static_cast<T *>(operator new[](sizeof(T)*dataSize,
+                                         std::align_val_t(alignof(T))))}
+{
+    for (size_t i = 0; i != dataSize; ++i)
+    {
+        new (&data[i]) T{};
+    }
+}
+
+template <class T>
+StaticVector<T>::StaticVector(std::initializer_list<T> const &il)
+  : dataSize{il.size()}
+  , data{static_cast<T *>(operator new[](sizeof(T)*dataSize,
+                                         std::align_val_t(alignof(T))))}
+{
+    for (size_t i = 0; i != dataSize; ++i)
+    {
+        new (&data[i]) T{il.begin()[i]};
+    }
+}
+
+template <class T>
+StaticVector<T>::StaticVector(StaticVector const &rhs)
+  : dataSize(rhs.dataSize)  // copy size
+  , data{static_cast<T *>(operator new[](sizeof(T)*dataSize,
+                                         std::align_val_t(alignof(T))))}
+{
+    for (size_t i = 0; i != dataSize; ++i)
+    {
+        new (&data[i]) T{rhs.data[i]};
+    }
+}
+
+template <class T>
+StaticVector<T>::StaticVector(StaticVector &&rhs)
+  : dataSize(rhs.dataSize)  // copy size
+  , data(rhs.data)          // copy pointer
+{
+    rhs.data = nullptr;  // invalidate other data
+    rhs.dataSize = 0;
+}
+
+template <class T>
+StaticVector<T>::~StaticVector()
+{
+    for (size_t i = dataSize; i != 0; )
+    {
+        data[--i].~T();
+    }
+    operator delete[](data, std::align_val_t(alignof(T)));
+}
+
+template <class T>   // copy or move construction
+StaticVector<T> &StaticVector<T>::operator=(StaticVector<T> tmp)
+{
+    std::swap(data, tmp.data);
+    std::swap(dataSize, tmp.dataSize);
+
+    return *this;
+}                          // destruct old value
+
+template <class T>
+T &StaticVector<T>::operator[](size_t idx)
+{
+    checkSizeAndThrow(idx);
+    return data[idx];
+}
+
+template <class T>
+T const &StaticVector<T>::operator[](size_t idx) const
+{
+    checkSizeAndThrow(idx);
+    return data[idx];
+}
+
+template <class T>
+void  StaticVector<T>::checkSizeAndThrow(size_t idx) const
+{
+    if (idx < 0 || idx >= dataSize)
+    {
+        // LLVM worked
+        //throw std::out_of_range((std::stringstream() << "Index out of range, got: " 
+        //<< idx << ", where highest valid is: " << dataSize <<  "\n").str());
+        // GCC alternative
+        throw std::out_of_range("Bad idx");
+    }
+}
+
+template <class T>
+T *StaticVector<T>::begin()
+{
+    return data;
+}
+
+template <class T>
+T const *StaticVector<T>::begin() const
+{
+    return data;
+}
+
+template <class T>
+T *StaticVector<T>::end()
+{
+    return data + dataSize;
+}
+
+template <class T>
+T const *StaticVector<T>::end() const
+{
+    return data + dataSize;
+}
+
+template <class T>
+size_t StaticVector<T>::size() const
+{
+    return dataSize;
+}
+
+template <class T>
+bool StaticVector<T>::equal(StaticVector const &other) const
+{
+    if (dataSize == other.dataSize)
+    {
+        for (size_t i = 0; i != dataSize; ++i)
+        {
+            if (data[i] != other.data[i])
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    return false;
+}
+
+template <class T>
+bool operator==(StaticVector<T> const &v1, StaticVector<T> const &v2)
+{
+    return v1.equal(v2);
+}
+} // namespace exercise
