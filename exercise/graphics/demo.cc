@@ -71,17 +71,17 @@ void circleWin()
 {
     using std::move;
 
-    Canvas c(320, 240, "Circle Win");
+    Canvas c{320, 240, "Circle Win"};
 
     Shape *crcl = new PathShape{new Circle{100}, "Circle", true
                               , Position{160, 120}
                               , Color{0, 0, 0.5}};
     c += crcl;
 
-    Text *txt = new Text{"Blue Circle", "Text 1", Position(10, 20)};
-    Shape *frame = new PathShape{new Rectangle(70, 30), "Frame 1", false};
+    auto txt = new Text{"Blue Circle", "Text 1", Position{10, 20}};
+    auto frame = new PathShape{new Rectangle{70, 30}, "Frame 1", false};
 
-    Group *g = new Group{"Frame Group 1"};
+    auto g = new Group{"Frame Group 1"};
     g->addChild(txt);
     g->addChild(frame);
 
@@ -96,14 +96,14 @@ void textWin()
     using std::move;
 
     Canvas c{200, 100, "Text Win 1"};
-    Text *txt1 = new Text{"Hello", "Text 2", Position(30, 20)};
+    auto txt1 = new Text{"Hello", "Text 2", Position{30, 20}};
     Shape *frame = new PathShape{new Rectangle(90, 30), "Frame 2", false};
-    Text *txt2 = new Text(*txt1);
+    auto txt2 = new Text{*txt1};
     txt2->setName("Text 3");
     txt2->setText("World!");
-    txt2->setPosition(Position(150, 70));
+    txt2->setPosition(Position{150, 70});
 
-    Group *g = new Group{"Frame Group 2"};
+    auto g = new Group{"Frame Group 2"};
     g->addChild(txt1);
     g->addChild(frame);
     g->move(10, 10);
@@ -119,7 +119,7 @@ int main()
 {
     Canvas c1{640, 480, "Cairo Example"};
 
-    Shape *crcl = new PathShape{new Circle(100), "Circle", true, Position(320, 240), Color(0, 0, 0.5)};
+    auto crcl = new PathShape{new Circle(100), "Circle", true, Position(320, 240), Color(0, 0, 0.5)};
     c1 += crcl;
     c1.show();
     std::this_thread::sleep_for(sec1);
@@ -128,7 +128,7 @@ int main()
     c1.show();
     std::this_thread::sleep_for(sec1);
 
-    Text txtBase{"Hello", "TextBase", Position(20, 20)};
+    Text txtBase{"Hello", "TextBase", Position{20, 20}};
     Rectangle frameBase{70, 30};
 
     Text *txt = new Text{txtBase};

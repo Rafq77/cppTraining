@@ -21,12 +21,16 @@ endif
 M4_INCLUDE ?= -I$(TOPDIR)/../common
 
 STD ?= -std=c++2a
+#STD ?= -std=c++17
 COMMFLAGS = -Wall $(STD) -g $(OPT)
 
 #TC ?= LLVM
 TC ?= GCC
+GCC=gcc-8
 
 CXXFLAGS += $(COMMFLAGS) $(INCLUDES)
+CXXFLAGS += -fsanitize=address
+#CXXFLAGS += -fsanitize=undefined
 
 HEADERS ?= $(wildcard *.hh)
 SOURCES += $(wildcard *.cc)
@@ -36,17 +40,19 @@ ENVCXX := $(shell echo "$$CXX")
 
 ifeq ($(TC), GCC)
 ifeq ($(ENVCXX),)
-# CXX = g++
 CXX = g++-8
+CC = gcc
 endif
 endif
 
 ifeq ($(TC), LLVM)
 ifeq ($(ENVCXX),)
 CXX = clang++
+CC = clang
 endif
 STD += -stdlib=libc++
-LIBS += -lc++abi
+LIBS += -lc++abi 
+CXXFLAGS += -D_LIBCPP_ENABLE_CXX17_REMOVED_FEATURES
 endif
 
 LD = $(CXX)
